@@ -1,0 +1,8 @@
+node_modules/
+frontend/node_modules/
+public/
+data/
+*.sqlite
+.env
+*.local.json
+.DS_Store

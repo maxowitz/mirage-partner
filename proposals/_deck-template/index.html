@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Proposal — Mirage Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+
+<style>
+/* ── Tokens ── */
+:root {
+  --bg:        #030201;
+  --bg-card:   rgba(255,255,255,0.035);
+  --gold:      #B98C37;
+  --gold-l:    rgba(185,140,55,0.75);
+  --text:      rgba(240,230,210,0.90);
+  --text-m:    rgba(240,230,210,0.40);
+  --border:    rgba(255,255,255,0.08);
+  --rule:      rgba(185,140,55,0.25);
+  --font-d:    "Cormorant Garamond", Georgia, serif;
+  --font-b:    "Inter", system-ui, sans-serif;
+  --font-m:    "JetBrains Mono", monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);-webkit-font-smoothing:antialiased}
+
+/* ── Sections ── */
+section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:6rem clamp(2rem,8vw,8rem);border-bottom:1px solid var(--border);position:relative}
+section:last-child{border-bottom:none}
+
+.eyebrow{font-family:var(--font-m);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold-l);margin-bottom:1.2rem}
+h1,h2{font-family:var(--font-d);font-weight:300;letter-spacing:-0.02em;color:var(--text);line-height:1.0}
+h1{font-size:clamp(3rem,7vw,6rem)}
+h2{font-size:clamp(2rem,4vw,3.5rem);margin-bottom:1.5rem}
+p{font-size:0.9rem;color:rgba(240,230,210,0.55);line-height:1.8;max-width:56ch}
+
+/* ── Hero ── */
+#hero{background:linear-gradient(135deg,rgba(185,140,55,0.05) 0%,transparent 60%)}
+#hero h1 em{color:var(--gold-l);font-style:italic}
+#hero .subhead{font-size:1rem;color:var(--text-m);margin-top:1.5rem;font-family:var(--font-d);font-style:italic}
+#hero .date{font-family:var(--font-m);font-size:9px;letter-spacing:0.15em;color:var(--text-m);margin-top:3rem}
+#hero::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--rule),transparent)}
+
+/* ── Rule ── */
+.rule{width:48px;height:1px;background:var(--rule);margin-bottom:2rem}
+
+/* ── Bullets ── */
+.bullets{list-style:none;margin-top:1.5rem;display:flex;flex-direction:column;gap:0.75rem}
+.bullets li{font-size:0.85rem;color:rgba(240,230,210,0.6);padding-left:1.25rem;position:relative;line-height:1.7}
+.bullets li::before{content:'—';position:absolute;left:0;color:var(--gold-l);font-family:var(--font-m)}
+
+/* ── Investment table ── */
+.invest-table{margin-top:2rem;border:1px solid var(--border);border-radius:4px;overflow:hidden;max-width:480px}
+.invest-row{display:flex;justify-content:space-between;padding:0.85rem 1.25rem;border-bottom:1px solid var(--border);font-size:0.85rem}
+.invest-row:last-child{border-bottom:none}
+.invest-row.total{background:rgba(185,140,55,0.06);font-weight:500;color:var(--text)}
+.invest-row .label{color:rgba(240,230,210,0.6)}
+.invest-row .amount{font-family:var(--font-m);color:var(--gold-l)}
+.invest-note{margin-top:1rem;font-size:0.78rem;color:var(--text-m);font-style:italic}
+
+/* ── Timeline ── */
+.timeline{margin-top:2.5rem;display:flex;flex-direction:column;gap:0}
+.tl-phase{display:flex;gap:2rem;padding:1.5rem 0;border-bottom:1px solid var(--border)}
+.tl-phase:last-child{border-bottom:none}
+.tl-week{font-family:var(--font-m);font-size:9px;letter-spacing:0.1em;color:var(--gold-l);min-width:90px;padding-top:2px}
+.tl-body .tl-label{font-size:0.9rem;font-weight:500;color:var(--text);margin-bottom:0.3rem}
+.tl-body .tl-desc{font-size:0.82rem;color:var(--text-m);line-height:1.6}
+
+/* ── CTA ── */
+#cta{text-align:center;align-items:center}
+#cta h2{margin-bottom:1rem}
+#cta p{text-align:center;margin:0 auto}
+#cta .cta-btn{display:inline-flex;margin-top:2.5rem;padding:0.8rem 2rem;background:rgba(185,140,55,0.1);color:var(--gold-l);border:1px solid rgba(185,140,55,0.3);border-radius:2px;text-decoration:none;font-family:var(--font-m);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;transition:all 0.25s}
+#cta .cta-btn:hover{background:rgba(185,140,55,0.2);border-color:rgba(185,140,55,0.6)}
+
+/* ── Footer ── */
+footer{padding:3rem clamp(2rem,8vw,8rem);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-brand{font-family:var(--font-d);font-size:1.1rem;font-weight:300;color:rgba(240,230,210,0.5)}
+.footer-tagline{font-size:0.78rem;color:var(--text-m)}
+.footer-email{font-family:var(--font-m);font-size:9px;letter-spacing:0.15em;color:rgba(185,140,55,0.5);text-decoration:none}
+.footer-email:hover{color:var(--gold-l)}
+
+/* ── Nav dots ── */
+.nav-dots{position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:0.5rem;z-index:100;pointer-events:none}
+.nav-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s}
+.nav-dot.active{background:rgba(185,140,55,0.85);transform:scale(1.8)}
+
+/* ── Fade-in animation ── */
+.fade-up{opacity:0;transform:translateY(16px);transition:opacity 0.7s ease,transform 0.7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- Nav dots (populated by JS) -->
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- Content populated by JS from CONTENT + overrides -->
+<div id="app"></div>
+
+<!-- Load base content, then overrides (overrides win), then render -->
+<script src="/content.js"></script>
+<script>
+(async function () {
+  // Merge overrides from server
+  let overrides = {};
+  try {
+    const r = await fetch('/_overrides.json');
+    if (r.ok) overrides = await r.json();
+  } catch (_) {}
+
+  // Deep merge overrides into CONTENT
+  function merge(base, over) {
+    if (!over) return base;
+    const out = Object.assign({}, base);
+    for (const k of Object.keys(over)) {
+      if (over[k] && typeof over[k] === 'object' && !Array.isArray(over[k]) &&
+          base[k] && typeof base[k] === 'object' && !Array.isArray(base[k])) {
+        out[k] = merge(base[k], over[k]);
+      } else {
+        out[k] = over[k];
+      }
+    }
+    return out;
+  }
+  const C = merge(window.CONTENT, overrides);
+
+  // Apply theme CSS vars
+  const root = document.documentElement;
+  const t = C.theme?.colors || {};
+  if (t.bg)        root.style.setProperty('--bg',        t.bg);
+  if (t.bgCard)    root.style.setProperty('--bg-card',   t.bgCard);
+  if (t.gold)      root.style.setProperty('--gold',      t.gold);
+  if (t.goldLight) root.style.setProperty('--gold-l',    t.goldLight);
+  if (t.text)      root.style.setProperty('--text',      t.text);
+  if (t.textMuted) root.style.setProperty('--text-m',    t.textMuted);
+
+  document.title = C.meta?.browserTitle || 'Proposal — Mirage Studios';
+
+  const app = document.getElementById('app');
+
+  // Hero
+  const hero = C.hero || {};
+  app.innerHTML += `
+  <section id="hero">
+    <div class="eyebrow fade-up">${hero.eyebrow || ''}</div>
+    <h1 class="fade-up">${(hero.headline || '').replace(/\n/g,'<br/>')}</h1>
+    <div class="subhead fade-up">${hero.subhead || ''}</div>
+    <div class="date fade-up">${hero.date || ''}</div>
+  </section>`;
+
+  // Dynamic sections
+  const sections = C.sections || [];
+  const sectionIds = ['hero'];
+  for (const s of sections) {
+    sectionIds.push(s.id);
+    let inner = `<div class="eyebrow fade-up">${s.eyebrow || ''}</div>
+      <div class="rule fade-up"></div>
+      <h2 class="fade-up">${s.title || ''}</h2>
+      <p class="fade-up">${s.body || ''}</p>`;
+
+    if (s.bullets?.length) {
+      inner += `<ul class="bullets fade-up">${s.bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
+    }
+    if (s.items?.length) {
+      inner += `<div class="invest-table fade-up">
+        ${s.items.map(i => `<div class="invest-row"><span class="label">${i.label}</span><span class="amount">${i.amount}</span></div>`).join('')}
+        ${s.total ? `<div class="invest-row total"><span class="label">Total</span><span class="amount">${s.total}</span></div>` : ''}
+      </div>`;
+      if (s.note) inner += `<p class="invest-note fade-up">${s.note}</p>`;
+    }
+    if (s.phases?.length) {
+      inner += `<div class="timeline fade-up">${s.phases.map(p =>
+        `<div class="tl-phase"><div class="tl-week">${p.week}</div><div class="tl-body"><div class="tl-label">${p.label}</div><div class="tl-desc">${p.desc}</div></div></div>`
+      ).join('')}</div>`;
+    }
+    app.innerHTML += `<section id="${s.id}">${inner}</section>`;
+  }
+
+  // CTA
+  const cta = C.cta || {};
+  sectionIds.push('cta');
+  app.innerHTML += `
+  <section id="cta">
+    <div class="eyebrow fade-up">${cta.eyebrow || 'Next Steps'}</div>
+    <h2 class="fade-up">${cta.headline || 'Ready to build?'}</h2>
+    <p class="fade-up">${cta.body || ''}</p>
+    <a href="mailto:${cta.email || 'hello@miragestudios.io'}" class="cta-btn fade-up">${cta.buttonLabel || 'Get in Touch →'}</a>
+  </section>`;
+
+  // Footer
+  const f = C.footer || {};
+  app.innerHTML += `
+  <footer>
+    <div>
+      <div class="footer-brand">${f.brand || 'Mirage Studios'}</div>
+      <div class="footer-tagline">${f.tagline || 'We build exactly what you imagine.'}</div>
+    </div>
+    <a href="mailto:${f.email || 'hello@miragestudios.io'}" class="footer-email">${f.email || 'hello@miragestudios.io'}</a>
+  </footer>`;
+
+  // Nav dots
+  const navDots = document.getElementById('navDots');
+  navDots.innerHTML = sectionIds.map((id, i) =>
+    `<div class="nav-dot" data-i="${i}"></div>`
+  ).join('');
+
+  // IntersectionObserver for fade-ups + active nav dot
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        const idx = sectionIds.indexOf(entry.target.id);
+        document.querySelectorAll('.nav-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === idx);
+        });
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  document.querySelectorAll('section[id]').forEach(el => observer.observe(el));
+})();
+</script>
+<script src="/session-tracker.js"></script>
+</body>
+</html>

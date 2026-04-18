@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Editor — Mirage Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset & base ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: "Inter", -apple-system, sans-serif;
+  background: #030201;
+  color: rgba(240,230,210,0.85);
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Topbar ───────────────────────────────────────────────────────── */
+.topbar {
+  flex-shrink: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 18px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  z-index: 10;
+}
+.topbar__back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: rgba(240,230,210,0.4);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  padding: 6px 10px 6px 0;
+  transition: color .15s;
+  white-space: nowrap;
+}
+.topbar__back:hover { color: rgba(240,230,210,0.75); }
+.topbar__back svg { flex-shrink: 0; }
+.topbar__sep {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.08);
+  margin: 0 14px;
+  flex-shrink: 0;
+}
+.topbar__brand {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 17px;
+  font-weight: 300;
+  color: rgba(240,230,210,0.6);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.topbar__sep2 {
+  font-size: 13px;
+  color: rgba(255,255,255,0.15);
+  margin: 0 10px;
+  flex-shrink: 0;
+}
+.topbar__name {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(240,230,210,0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+.topbar__badge {
+  flex-shrink: 0;
+  margin-left: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(185,140,55,0.7);
+  border: 1px solid rgba(185,140,55,0.3);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+.topbar__spacer { flex: 1; min-width: 12px; }
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* status pill */
+.save-pill {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(240,230,210,0.35);
+  white-space: nowrap;
+  transition: all .2s;
+  user-select: none;
+}
+.save-pill.is-unsaved {
+  color: rgba(185,140,55,0.7);
+  border-color: rgba(185,140,55,0.3);
+}
+.save-pill.is-saving {
+  color: rgba(240,230,210,0.5);
+  border-color: rgba(255,255,255,0.12);
+}
+.save-pill.is-saved {
+  color: rgba(120,180,120,0.7);
+  border-color: rgba(120,180,120,0.25);
+}
+
+/* topbar buttons */
+.tb-btn {
+  font: inherit;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: rgba(240,230,210,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 6px 13px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  transition: all .15s;
+  user-select: none;
+}
+.tb-btn:hover:not(:disabled) {
+  color: rgba(240,230,210,0.85);
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.03);
+}
+.tb-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.tb-btn--gold {
+  color: rgba(185,140,55,0.8);
+  border-color: rgba(185,140,55,0.3);
+  background: rgba(185,140,55,0.06);
+}
+.tb-btn--gold:hover:not(:disabled) {
+  color: rgba(185,140,55,1);
+  border-color: rgba(185,140,55,0.55);
+  background: rgba(185,140,55,0.12);
+}
+.tb-btn--primary {
+  color: rgba(185,140,55,0.9);
+  border-color: rgba(185,140,55,0.4);
+  background: rgba(185,140,55,0.1);
+}
+.tb-btn--primary:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(185,140,55,0.25);
+  border-color: rgba(185,140,55,0.7);
+}
+
+/* ── Main split ───────────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Editor panel ─────────────────────────────────────────────────── */
+.editor-panel {
+  width: 50%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.02);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+/* Generate form */
+.gen-form {
+  flex-shrink: 0;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .35s cubic-bezier(.4,0,.2,1);
+  border-bottom: 1px solid transparent;
+}
+.gen-form.is-open {
+  max-height: 480px;
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+.gen-form__inner {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 480px;
+}
+.gen-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.gen-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gen-form__label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(185,140,55,0.55);
+}
+.gen-form__input,
+.gen-form__textarea,
+.gen-form__select {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(185,140,55,0.1);
+  border-radius: 3px;
+  padding: 7px 10px;
+  color: rgba(240,230,210,0.85);
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  outline: none;
+  transition: border-color .15s;
+  resize: none;
+}
+.gen-form__input:focus,
+.gen-form__textarea:focus,
+.gen-form__select:focus {
+  border-color: rgba(185,140,55,0.4);
+}
+.gen-form__input::placeholder,
+.gen-form__textarea::placeholder {
+  color: rgba(240,230,210,0.2);
+}
+.gen-form__textarea { min-height: 60px; line-height: 1.5; }
+.gen-form__select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(185,140,55,0.4)'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  cursor: pointer;
+}
+.gen-form__select option { background: #1a1a14; color: rgba(240,230,210,0.85); }
+.gen-form__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.gen-status {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: rgba(185,140,55,0.6);
+  letter-spacing: 0.05em;
+  min-height: 16px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Editor textarea area */
+.editor-textarea-wrap {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.editor-label {
+  flex-shrink: 0;
+  padding: 8px 18px 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(185,140,55,0.4);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.editor-char-count {
+  color: rgba(240,230,210,0.2);
+}
+.editor-textarea {
+  flex: 1;
+  width: 100%;
+  resize: none;
+  background: rgba(0,0,0,0.3);
+  border: none;
+  outline: none;
+  padding: 16px 18px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(240,230,210,0.85);
+  tab-size: 2;
+  overflow-y: auto;
+  caret-color: rgba(185,140,55,0.8);
+}
+.editor-textarea::selection {
+  background: rgba(185,140,55,0.2);
+}
+/* Streaming overlay on textarea */
+.editor-streaming-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(185,140,55,0.6);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform .2s;
+}
+.editor-streaming-bar.is-active {
+  animation: stream-pulse 1.2s ease-in-out infinite;
+}
+@keyframes stream-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ── Preview panel ────────────────────────────────────────────────── */
+.preview-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  overflow: hidden;
+  position: relative;
+}
+.preview-iframe {
+  flex: 1;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #000;
+}
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: rgba(3,2,1,0.92);
+  color: rgba(240,230,210,0.4);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.preview-overlay.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.preview-overlay__label { color: rgba(240,230,210,0.35); }
+.preview-spinner {
+  width: 18px; height: 18px;
+  border: 1.5px solid rgba(185,140,55,0.15);
+  border-top-color: rgba(185,140,55,0.6);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Password modal ───────────────────────────────────────────────── */
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(3,2,1,0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal-scrim.is-open { display: flex; }
+.modal {
+  background: #0d0c0a;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 6px;
+  width: min(400px, 90vw);
+  padding: 28px 28px 24px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.modal__title {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 20px;
+  font-weight: 300;
+  color: rgba(240,230,210,0.8);
+  letter-spacing: -0.01em;
+}
+.modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.modal__label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(185,140,55,0.5);
+}
+.modal__input {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  padding: 9px 12px;
+  color: rgba(240,230,210,0.9);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .15s;
+}
+.modal__input:focus { border-color: rgba(185,140,55,0.4); }
+.modal__footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.modal__error {
+  font-size: 12px;
+  color: rgba(197,83,76,0.8);
+  min-height: 16px;
+}
+
+/* ── Toast ────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(20,18,14,0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(240,230,210,0.8);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transition: all .22s;
+  z-index: 200;
+  white-space: nowrap;
+}
+.toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<header class="topbar">
+  <a class="topbar__back" href="/">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M7.5 2L3.5 6L7.5 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Back
+  </a>
+  <div class="topbar__sep"></div>
+  <span class="topbar__brand">Mirage</span>
+  <span class="topbar__sep2">/</span>
+  <span class="topbar__name" id="topbarName">…</span>
+  <span class="topbar__badge" id="topbarBadge">deck</span>
+  <div class="topbar__spacer"></div>
+  <div class="topbar__actions">
+    <span class="save-pill" id="savePill">Saved</span>
+    <button class="tb-btn tb-btn--gold" id="generateBtn" type="button" style="display:none;">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+        <path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Generate AI
+    </button>
+    <button class="tb-btn" id="saveDraftBtn" type="button" disabled>Save Draft</button>
+    <button class="tb-btn tb-btn--primary" id="publishBtn" type="button">Publish</button>
+    <button class="tb-btn" id="passwordBtn" type="button">
+      <svg width="10" height="11" viewBox="0 0 10 11" fill="none">
+        <rect x="1.5" y="4.5" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M3 4.5V3a2 2 0 0 1 4 0v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Password
+    </button>
+    <a class="tb-btn" id="previewLinkBtn" href="#" target="_blank" rel="noopener" title="Open preview in new tab">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+        <path d="M6.5 1H10v3.5M10 1L5 6M2 2H1v8h8V9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<!-- ── Main split ── -->
+<div class="main">
+
+  <!-- Editor panel -->
+  <div class="editor-panel">
+
+    <!-- Generate AI form (slides open for simple type) -->
+    <div class="gen-form" id="genForm">
+      <div class="gen-form__inner">
+        <div class="gen-form__row">
+          <div class="gen-form__field">
+            <label class="gen-form__label" for="gClientName">Client name</label>
+            <input class="gen-form__input" id="gClientName" type="text" placeholder="Acme Corp" autocomplete="off"/>
+          </div>
+          <div class="gen-form__field">
+            <label class="gen-form__label" for="gTone">Tone</label>
+            <select class="gen-form__select" id="gTone">
+              <option value="Premium &amp; Creative">Premium &amp; Creative</option>
+              <option value="Professional">Professional</option>
+              <option value="Casual &amp; Friendly">Casual &amp; Friendly</option>
+              <option value="Technical">Technical</option>
+            </select>
+          </div>
+        </div>
+        <div class="gen-form__field">
+          <label class="gen-form__label" for="gClientDesc">Describe the client</label>
+          <textarea class="gen-form__textarea" id="gClientDesc" rows="2" placeholder="What does this client do? Industry, scale, focus…"></textarea>
+        </div>
+        <div class="gen-form__field">
+          <label class="gen-form__label" for="gProjectDesc">Project description <span style="color:rgba(185,140,55,0.4)">*</span></label>
+          <textarea class="gen-form__textarea" id="gProjectDesc" rows="3" placeholder="What are we building for them? Scope, goals, key deliverables…"></textarea>
+        </div>
+        <div class="gen-form__field">
+          <label class="gen-form__label" for="gSections">Sections to include</label>
+          <input class="gen-form__input" id="gSections" type="text" placeholder="Overview, Timeline, Pricing, Team, Next Steps" autocomplete="off"/>
+        </div>
+        <div class="gen-form__field">
+          <label class="gen-form__label" for="gContext">Additional context</label>
+          <textarea class="gen-form__textarea" id="gContext" rows="2" placeholder="Budget constraints, special requirements, reference links…"></textarea>
+        </div>
+        <div class="gen-form__footer">
+          <span class="gen-status" id="genStatus"></span>
+          <button class="tb-btn tb-btn--gold" id="generateSubmitBtn" type="button">Generate →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Textarea / code area -->
+    <div class="editor-textarea-wrap">
+      <div class="editor-label">
+        <span id="editorLabel">HTML Draft</span>
+        <span class="editor-char-count" id="charCount"></span>
+      </div>
+      <textarea class="editor-textarea" id="editorTextarea" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      <div class="editor-streaming-bar" id="streamingBar"></div>
+    </div>
+  </div>
+
+  <!-- Preview panel -->
+  <div class="preview-panel">
+    <iframe class="preview-iframe" id="previewFrame" title="Proposal preview" src="about:blank"></iframe>
+    <div class="preview-overlay" id="previewOverlay">
+      <div class="preview-spinner"></div>
+      <span class="preview-overlay__label" id="previewOverlayLabel">Loading preview…</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Password modal -->
+<div class="modal-scrim" id="passwordModal">
+  <div class="modal" role="dialog" aria-labelledby="pwModalTitle">
+    <div class="modal__title" id="pwModalTitle">Set Password</div>
+    <div class="modal__field">
+      <label class="modal__label" for="pwInput">New password</label>
+      <input class="modal__input" id="pwInput" type="password" placeholder="Leave blank to remove password" autocomplete="new-password"/>
+    </div>
+    <div class="modal__error" id="pwError"></div>
+    <div class="modal__footer">
+      <button class="tb-btn" id="pwCancelBtn" type="button">Cancel</button>
+      <button class="tb-btn tb-btn--primary" id="pwSaveBtn" type="button">Save Password</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =============================================================
+   Mirage Studios — Proposal Editor
+   admin.miragestudios.io/editor/<slug>
+   ============================================================= */
+
+const ROOT_DOMAIN  = window.__ROOT_DOMAIN__ || 'miragestudios.io';
+const PROPOSALS    = window.__PROPOSALS__   || [];
+
+const SLUG = (function () {
+  const m = location.pathname.match(/^\/editor\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+})();
+
+const proposal = PROPOSALS.find(p => p.slug === SLUG) || null;
+
+/* ── DOM refs ─────────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+const els = {
+  topbarName:     $('topbarName'),
+  topbarBadge:    $('topbarBadge'),
+  savePill:       $('savePill'),
+  generateBtn:    $('generateBtn'),
+  saveDraftBtn:   $('saveDraftBtn'),
+  publishBtn:     $('publishBtn'),
+  passwordBtn:    $('passwordBtn'),
+  previewLinkBtn: $('previewLinkBtn'),
+
+  genForm:            $('genForm'),
+  gClientName:        $('gClientName'),
+  gTone:              $('gTone'),
+  gClientDesc:        $('gClientDesc'),
+  gProjectDesc:       $('gProjectDesc'),
+  gSections:          $('gSections'),
+  gContext:           $('gContext'),
+  genStatus:          $('genStatus'),
+  generateSubmitBtn:  $('generateSubmitBtn'),
+
+  editorLabel:   $('editorLabel'),
+  charCount:     $('charCount'),
+  editorTextarea:$('editorTextarea'),
+  streamingBar:  $('streamingBar'),
+
+  previewFrame:        $('previewFrame'),
+  previewOverlay:      $('previewOverlay'),
+  previewOverlayLabel: $('previewOverlayLabel'),
+
+  passwordModal: $('passwordModal'),
+  pwInput:       $('pwInput'),
+  pwError:       $('pwError'),
+  pwCancelBtn:   $('pwCancelBtn'),
+  pwSaveBtn:     $('pwSaveBtn'),
+
+  toast: $('toast'),
+};
+
+/* ── State ───────────────────────────────────────────────── */
+const S = {
+  type:           proposal ? proposal.type : 'deck',
+  clientName:     proposal ? (proposal.clientName || '') : '',
+  originalContent:'',   // last-loaded content (string)
+  isDirty:        false,
+  isSaving:       false,
+  isGenerating:   false,
+  genFormOpen:    false,
+  previewUrl:     null,
+};
+
+/* ── Helpers ─────────────────────────────────────────────── */
+function toast(msg, duration = 2000) {
+  els.toast.textContent = msg;
+  els.toast.classList.add('is-visible');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => els.toast.classList.remove('is-visible'), duration);
+}
+
+function setSavePill(state) {
+  const pill = els.savePill;
+  pill.classList.remove('is-unsaved', 'is-saving', 'is-saved');
+  if (state === 'unsaved') { pill.textContent = 'Unsaved changes'; pill.classList.add('is-unsaved'); }
+  else if (state === 'saving') { pill.textContent = 'Saving…'; pill.classList.add('is-saving'); }
+  else { pill.textContent = 'Saved'; pill.classList.add('is-saved'); }
+}
+
+function setPreviewOverlay(visible, label) {
+  if (visible) {
+    els.previewOverlay.classList.remove('is-hidden');
+    if (label) els.previewOverlayLabel.textContent = label;
+  } else {
+    els.previewOverlay.classList.add('is-hidden');
+  }
+}
+
+function updateCharCount() {
+  const n = els.editorTextarea.value.length;
+  els.charCount.textContent = n > 0 ? n.toLocaleString() + ' chars' : '';
+}
+
+function markDirty() {
+  S.isDirty = true;
+  els.saveDraftBtn.disabled = false;
+  setSavePill('unsaved');
+}
+
+function markClean(content) {
+  S.originalContent = content;
+  S.isDirty = false;
+  els.saveDraftBtn.disabled = true;
+  setSavePill('saved');
+}
+
+/* ── API ─────────────────────────────────────────────────── */
+async function apiFetch(method, path, body) {
+  const opts = { method, credentials: 'include', headers: {} };
+  if (body !== undefined) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  const r = await fetch(path, opts);
+  if (!r.ok) {
+    let msg = 'HTTP ' + r.status;
+    try { msg += ': ' + ((await r.json()).error || ''); } catch {}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+async function loadContent() {
+  if (!SLUG) return;
+  try {
+    if (S.type === 'simple') {
+      const d = await apiFetch('GET', '/api/proposals/' + SLUG + '/html');
+      const html = d.draft !== null && d.draft !== undefined ? d.draft : (d.published || '');
+      els.editorTextarea.value = html;
+      markClean(html);
+      updateCharCount();
+    } else {
+      const d = await apiFetch('GET', '/api/proposals/' + SLUG + '/overrides');
+      const json = JSON.stringify(d.draft && Object.keys(d.draft).length ? d.draft : d.published || {}, null, 2);
+      els.editorTextarea.value = json;
+      markClean(json);
+      updateCharCount();
+    }
+  } catch (e) {
+    toast('Failed to load content: ' + e.message, 4000);
+  }
+}
+
+async function getPreviewToken() {
+  const d = await apiFetch('GET', '/api/proposals/' + SLUG + '/preview-token');
+  return d.previewUrl;
+}
+
+async function refreshPreview() {
+  if (!SLUG) return;
+  setPreviewOverlay(true, 'Loading preview…');
+  try {
+    const url = await getPreviewToken();
+    S.previewUrl = url;
+    if (els.previewLinkBtn) els.previewLinkBtn.href = url;
+    // Load in iframe — hide overlay once loaded
+    els.previewFrame.onload = () => setPreviewOverlay(false);
+    els.previewFrame.src = url;
+  } catch (e) {
+    setPreviewOverlay(true, 'Preview unavailable');
+    console.warn('[editor] preview token error:', e.message);
+  }
+}
+
+async function saveDraft() {
+  if (S.isSaving || !SLUG) return;
+  S.isSaving = true;
+  setSavePill('saving');
+  els.saveDraftBtn.disabled = true;
+  const content = els.editorTextarea.value;
+  try {
+    if (S.type === 'simple') {
+      await apiFetch('PUT', '/api/proposals/' + SLUG + '/html', { html: content });
+    } else {
+      let parsed;
+      try { parsed = JSON.parse(content); } catch (e) { throw new Error('Invalid JSON: ' + e.message); }
+      await apiFetch('PUT', '/api/proposals/' + SLUG + '/overrides', parsed);
+    }
+    markClean(content);
+    toast('Draft saved');
+    await refreshPreview();
+  } catch (e) {
+    setSavePill('unsaved');
+    els.saveDraftBtn.disabled = false;
+    toast('Save failed: ' + e.message, 4000);
+  } finally {
+    S.isSaving = false;
+  }
+}
+
+async function publish() {
+  if (!SLUG) return;
+  if (S.isDirty) {
+    const ok = confirm('You have unsaved changes. Save draft first, then publish?');
+    if (!ok) return;
+    await saveDraft();
+    if (S.isDirty) return; // save failed
+  }
+  const ok = confirm('Publish draft to live? Visitors will see the updated proposal immediately.');
+  if (!ok) return;
+  els.publishBtn.disabled = true;
+  try {
+    await apiFetch('POST', '/api/proposals/' + SLUG + '/publish');
+    toast('Published live');
+  } catch (e) {
+    toast('Publish failed: ' + e.message, 4000);
+  } finally {
+    els.publishBtn.disabled = false;
+  }
+}
+
+/* ── Generate AI (simple type only) ─────────────────────── */
+function toggleGenForm() {
+  S.genFormOpen = !S.genFormOpen;
+  els.genForm.classList.toggle('is-open', S.genFormOpen);
+  if (S.genFormOpen) els.gProjectDesc.focus();
+}
+
+async function runGenerate() {
+  if (S.isGenerating || !SLUG) return;
+  const projectDesc = els.gProjectDesc.value.trim();
+  if (!projectDesc) { toast('Project description is required'); els.gProjectDesc.focus(); return; }
+
+  S.isGenerating = true;
+  els.generateSubmitBtn.disabled = true;
+  els.streamingBar.classList.add('is-active');
+  els.genStatus.textContent = 'Connecting…';
+  setPreviewOverlay(true, 'Generating…');
+
+  els.editorTextarea.value = '';
+  updateCharCount();
+
+  const body = {
+    clientName:         els.gClientName.value.trim() || S.clientName,
+    clientDescription:  els.gClientDesc.value.trim(),
+    projectDescription: projectDesc,
+    sections:           els.gSections.value.trim(),
+    tone:               els.gTone.value,
+    additionalContext:  els.gContext.value.trim(),
+  };
+
+  let fullHtml = '';
+  let charBuf  = 0;
+
+  try {
+    const resp = await fetch('/api/proposals/' + SLUG + '/generate', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: 'Request failed' }));
+      throw new Error(err.error || 'HTTP ' + resp.status);
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        let parsed;
+        try { parsed = JSON.parse(line.slice(6)); } catch { continue; }
+        if (parsed.error) throw new Error(parsed.error);
+        if (parsed.delta) {
+          fullHtml += parsed.delta;
+          charBuf += parsed.delta.length;
+          // Batch DOM updates every ~500 chars for performance
+          if (charBuf >= 500) {
+            els.editorTextarea.value = fullHtml;
+            updateCharCount();
+            els.genStatus.textContent = fullHtml.length.toLocaleString() + ' chars…';
+            charBuf = 0;
+          }
+        }
+        if (parsed.done) break;
+      }
+    }
+
+    // Final flush
+    els.editorTextarea.value = fullHtml;
+    updateCharCount();
+    els.genStatus.textContent = 'Done — ' + fullHtml.length.toLocaleString() + ' chars';
+
+    // Mark dirty and auto-save
+    markDirty();
+    toast('Generation complete — saving draft…', 3000);
+    await saveDraft();
+
+  } catch (e) {
+    els.genStatus.textContent = 'Error: ' + e.message;
+    toast('Generation failed: ' + e.message, 5000);
+    setPreviewOverlay(false);
+  } finally {
+    S.isGenerating = false;
+    els.generateSubmitBtn.disabled = false;
+    els.streamingBar.classList.remove('is-active');
+  }
+}
+
+/* ── Password modal ─────────────────────────────────────── */
+function openPasswordModal() {
+  els.pwInput.value = '';
+  els.pwError.textContent = '';
+  els.passwordModal.classList.add('is-open');
+  els.pwInput.focus();
+}
+function closePasswordModal() {
+  els.passwordModal.classList.remove('is-open');
+}
+async function savePassword() {
+  const pw = els.pwInput.value;
+  els.pwError.textContent = '';
+  els.pwSaveBtn.disabled = true;
+  try {
+    await apiFetch('POST', '/api/proposals/' + SLUG + '/password', { password: pw });
+    toast(pw ? 'Password updated' : 'Password removed');
+    closePasswordModal();
+  } catch (e) {
+    els.pwError.textContent = e.message;
+  } finally {
+    els.pwSaveBtn.disabled = false;
+  }
+}
+
+/* ── Event wiring ────────────────────────────────────────── */
+els.editorTextarea.addEventListener('input', () => {
+  updateCharCount();
+  if (els.editorTextarea.value !== S.originalContent) markDirty();
+  else { S.isDirty = false; els.saveDraftBtn.disabled = true; setSavePill('saved'); }
+});
+
+els.saveDraftBtn.addEventListener('click', () => saveDraft());
+els.publishBtn.addEventListener('click', () => publish());
+els.generateBtn.addEventListener('click', () => toggleGenForm());
+els.generateSubmitBtn.addEventListener('click', () => runGenerate());
+
+els.passwordBtn.addEventListener('click', () => openPasswordModal());
+els.pwCancelBtn.addEventListener('click', () => closePasswordModal());
+els.pwSaveBtn.addEventListener('click', () => savePassword());
+els.passwordModal.addEventListener('click', e => { if (e.target === els.passwordModal) closePasswordModal(); });
+
+els.pwInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') savePassword();
+  if (e.key === 'Escape') closePasswordModal();
+});
+
+// Cmd/Ctrl+S → save draft
+document.addEventListener('keydown', e => {
+  const mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key === 's') { e.preventDefault(); saveDraft(); }
+  if (mod && e.shiftKey && e.key === 'P') { e.preventDefault(); publish(); }
+  if (e.key === 'Escape') closePasswordModal();
+});
+
+// Tab key in textarea → insert 2 spaces
+els.editorTextarea.addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  const ta = els.editorTextarea;
+  const start = ta.selectionStart;
+  const end   = ta.selectionEnd;
+  ta.value = ta.value.slice(0, start) + '  ' + ta.value.slice(end);
+  ta.selectionStart = ta.selectionEnd = start + 2;
+  markDirty();
+});
+
+// Warn on exit if dirty
+window.addEventListener('beforeunload', e => {
+  if (S.isDirty || S.isGenerating) { e.preventDefault(); e.returnValue = ''; }
+});
+
+/* ── Boot ────────────────────────────────────────────────── */
+async function boot() {
+  if (!SLUG) {
+    document.title = 'Editor — Mirage Studios';
+    toast('Invalid editor URL — expected /editor/<slug>', 6000);
+    return;
+  }
+
+  // Populate topbar
+  const name = proposal ? proposal.name : SLUG;
+  els.topbarName.textContent = name;
+  document.title = name + ' — Editor — Mirage Studios';
+  els.topbarBadge.textContent = S.type;
+
+  // Show Generate button for simple type only
+  if (S.type === 'simple') {
+    els.generateBtn.style.display = '';
+    els.editorLabel.textContent = 'HTML Draft';
+    // Pre-fill client name in generate form
+    if (S.clientName) els.gClientName.value = S.clientName;
+  } else {
+    els.generateBtn.style.display = 'none';
+    els.editorLabel.textContent = 'Overrides JSON (draft)';
+  }
+
+  // Load content from API
+  await loadContent();
+
+  // Load preview
+  await refreshPreview();
+}
+
+boot();
+</script>
+</body>
+</html>

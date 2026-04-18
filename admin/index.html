@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Mirage Studios — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:           #030201;
+  --sidebar-bg:   rgba(255,255,255,0.03);
+  --sidebar-rule: rgba(255,255,255,0.06);
+  --card-bg:      rgba(255,255,255,0.03);
+  --card-border:  rgba(255,255,255,0.07);
+  --gold:         rgba(185,140,55,0.8);
+  --gold-solid:   #B98C37;
+  --gold-dim:     rgba(185,140,55,0.25);
+  --text:         rgba(240,230,210,0.85);
+  --text-muted:   rgba(240,230,210,0.35);
+  --text-faint:   rgba(240,230,210,0.18);
+  --rule:         rgba(255,255,255,0.06);
+  --overlay:      rgba(3,2,1,0.72);
+  --danger:       rgba(200,80,70,0.85);
+  --danger-dim:   rgba(200,80,70,0.15);
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Inter', -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  --topbar-h:     56px;
+  --sidebar-w:    200px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================================
+   TOP BAR
+   ======================================================== */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  background: rgba(3,2,1,0.92);
+  border-bottom: 1px solid var(--rule);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.topbar__logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  text-decoration: none;
+}
+.topbar__badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-solid);
+  border: 1px solid var(--gold-dim);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+.topbar__spacer { flex: 1; }
+.topbar__build {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.05em;
+}
+.topbar__logout {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--rule);
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: color 0.18s, border-color 0.18s;
+  text-decoration: none;
+}
+.topbar__logout:hover {
+  color: var(--text);
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* ========================================================
+   SHELL: sidebar + main
+   ======================================================== */
+.shell {
+  display: flex;
+  min-height: 100vh;
+  padding-top: var(--topbar-h);
+}
+
+/* ========================================================
+   SIDEBAR
+   ======================================================== */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-rule);
+  position: fixed;
+  top: var(--topbar-h);
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  padding: 28px 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 18px 20px 8px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: color 0.16s, background 0.16s, border-color 0.16s;
+  letter-spacing: 0.01em;
+  border-radius: 0;
+}
+.nav-item svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.16s;
+}
+.nav-item:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.03);
+}
+.nav-item:hover svg { opacity: 0.75; }
+.nav-item.is-active {
+  color: var(--text);
+  border-left-color: var(--gold-solid);
+  background: rgba(185,140,55,0.05);
+}
+.nav-item.is-active svg { opacity: 1; }
+
+/* ========================================================
+   MAIN CONTENT
+   ======================================================== */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 40px 48px;
+  min-width: 0;
+}
+
+.page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1;
+}
+.page-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+/* ========================================================
+   BUTTONS
+   ======================================================== */
+.btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 9px 20px;
+  border-radius: 3px;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+  white-space: nowrap;
+}
+.btn:hover {
+  color: var(--text);
+  border-color: rgba(255,255,255,0.16);
+}
+.btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+.btn--gold {
+  background: linear-gradient(135deg, rgba(185,140,55,0.15) 0%, rgba(185,140,55,0.06) 100%);
+  border-color: var(--gold-dim);
+  color: var(--gold-solid);
+}
+.btn--gold:hover {
+  background: linear-gradient(135deg, rgba(185,140,55,0.22) 0%, rgba(185,140,55,0.1) 100%);
+  border-color: var(--gold);
+  color: #c9a547;
+}
+.btn--ghost {
+  padding: 6px 12px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-weight: 400;
+}
+.btn--danger {
+  color: var(--danger);
+  border-color: var(--danger-dim);
+}
+.btn--danger:hover {
+  background: var(--danger-dim);
+  border-color: var(--danger);
+}
+.btn[disabled] { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+/* ========================================================
+   PROPOSAL GRID
+   ======================================================== */
+.proposals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.proposal-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.proposal-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold-dim) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.proposal-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+}
+.proposal-card:hover::before { opacity: 1; }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.card-type-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.card-type-badge--simple {
+  color: var(--gold-solid);
+  background: rgba(185,140,55,0.1);
+  border: 1px solid var(--gold-dim);
+}
+.card-type-badge--deck {
+  color: rgba(160,200,230,0.8);
+  background: rgba(100,160,210,0.08);
+  border: 1px solid rgba(100,160,210,0.2);
+}
+
+.card-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  flex: 1;
+}
+.card-client {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.card-slug {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.card-subdomain {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-subdomain .dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(100,210,130,0.6);
+  flex-shrink: 0;
+}
+.card-lock {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.card-lock svg { width: 10px; height: 10px; }
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+  flex-wrap: wrap;
+}
+.card-edit-link {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.04em;
+  transition: color 0.16s;
+  margin-right: auto;
+}
+.card-edit-link svg { width: 12px; height: 12px; }
+.card-edit-link:hover { color: #c9a547; }
+
+/* ========================================================
+   EMPTY STATE
+   ======================================================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  gap: 16px;
+}
+.empty-state__icon {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  background: var(--card-bg);
+}
+.empty-state__icon svg { width: 22px; height: 22px; }
+.empty-state__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.empty-state__sub {
+  font-size: 13px;
+  color: var(--text-faint);
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+/* ========================================================
+   MODAL SCRIM
+   ======================================================== */
+.scrim {
+  position: fixed; inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 24px;
+}
+.scrim.is-open { display: flex; }
+
+/* ========================================================
+   MODAL SHELL
+   ======================================================== */
+.modal {
+  background: #0d0c0a;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  width: min(560px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+}
+.modal__header {
+  padding: 28px 28px 0;
+}
+.modal__title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.modal__sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.modal__body {
+  padding: 24px 28px;
+  flex: 1;
+}
+.modal__footer {
+  padding: 16px 28px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Step progress */
+.modal-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 28px 0;
+}
+.step-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  transition: background 0.2s;
+}
+.step-dot.is-active { background: var(--gold-solid); }
+.step-dot.is-done { background: rgba(100,200,120,0.5); }
+
+/* ========================================================
+   TYPE SELECTOR CARDS (step 1)
+   ======================================================== */
+.type-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 4px;
+}
+.type-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 22px 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.18s, background 0.18s;
+  text-align: left;
+}
+.type-card:hover {
+  border-color: rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+}
+.type-card.is-selected {
+  border-color: var(--gold-solid);
+  background: rgba(185,140,55,0.07);
+}
+.type-card__icon {
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+.type-card.is-selected .type-card__icon {
+  background: rgba(185,140,55,0.1);
+  border-color: var(--gold-dim);
+  color: var(--gold-solid);
+}
+.type-card__icon svg { width: 18px; height: 18px; }
+.type-card__name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.type-card__desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ========================================================
+   FORM (step 2)
+   ======================================================== */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.form-row:last-child { margin-bottom: 0; }
+.form-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.form-label span {
+  color: var(--text-faint);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  margin-left: 4px;
+}
+.form-input,
+.form-textarea {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.16s;
+  caret-color: var(--gold-solid);
+}
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--text-faint);
+}
+.form-input:focus,
+.form-textarea:focus {
+  border-color: rgba(185,140,55,0.45);
+  background: rgba(255,255,255,0.04);
+}
+.form-input.is-invalid {
+  border-color: rgba(200,80,70,0.5);
+}
+.form-hint {
+  font-size: 11px;
+  color: var(--text-faint);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+.form-hint.is-error {
+  color: rgba(200,80,70,0.85);
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ========================================================
+   TOAST
+   ======================================================== */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(20,18,14,0.96);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s, transform 0.22s;
+  z-index: 500;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ========================================================
+   SPINNER
+   ======================================================== */
+.spinner {
+  width: 14px; height: 14px;
+  border: 1.5px solid var(--card-border);
+  border-top-color: var(--gold-solid);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     TOP BAR
+     ========================================================= -->
+<header class="topbar">
+  <a class="topbar__logo" href="/">Mirage Studios</a>
+  <span class="topbar__badge">Admin</span>
+  <span class="topbar__spacer"></span>
+  <span class="topbar__build" id="buildId"></span>
+  <form method="POST" action="/auth/logout" style="margin:0;">
+    <button class="topbar__logout" type="submit">Log out</button>
+  </form>
+</header>
+
+<!-- =========================================================
+     SHELL
+     ========================================================= -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" aria-label="Admin navigation">
+    <span class="nav-label">Workspace</span>
+    <a class="nav-item is-active" href="/" data-nav="proposals">
+      <!-- file-text icon -->
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2.5" y="1.5" width="11" height="13" rx="1.5"/>
+        <line x1="5" y1="5.5" x2="11" y2="5.5"/>
+        <line x1="5" y1="8" x2="11" y2="8"/>
+        <line x1="5" y1="10.5" x2="8.5" y2="10.5"/>
+      </svg>
+      Proposals
+    </a>
+    <a class="nav-item" href="/analytics" data-nav="analytics">
+      <!-- bar-chart icon -->
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="1.5" y="9" width="3" height="5.5" rx="0.5"/>
+        <rect x="6.5" y="5.5" width="3" height="9" rx="0.5"/>
+        <rect x="11.5" y="2" width="3" height="12.5" rx="0.5"/>
+      </svg>
+      Analytics
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Proposals<span class="page-count" id="countLabel"></span></h1>
+      </div>
+      <button class="btn btn--gold" id="newProposalBtn" type="button">
+        <!-- plus icon -->
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <line x1="7" y1="1.5" x2="7" y2="12.5"/>
+          <line x1="1.5" y1="7" x2="12.5" y2="7"/>
+        </svg>
+        New Proposal
+      </button>
+    </div>
+
+    <div class="proposals-grid" id="proposalsGrid"></div>
+  </main>
+
+</div>
+
+<!-- =========================================================
+     NEW PROPOSAL MODAL
+     ========================================================= -->
+<div class="scrim" id="newModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal" id="modalInner">
+
+    <div class="modal__header">
+      <h2 class="modal__title" id="modalTitle">New Proposal</h2>
+      <p class="modal__sub" id="modalSub">Choose the proposal type to get started.</p>
+    </div>
+
+    <div class="modal-steps" aria-hidden="true">
+      <div class="step-dot is-active" id="dot1"></div>
+      <div class="step-dot" id="dot2"></div>
+    </div>
+
+    <!-- STEP 1: type selection -->
+    <div class="modal__body" id="step1Body">
+      <div class="type-cards" id="typeCards">
+
+        <button class="type-card" type="button" data-type="simple" aria-pressed="false">
+          <div class="type-card__icon">
+            <!-- sparkle icon -->
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>
+              <path d="M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M4.93 15.07l1.41-1.41M13.66 6.34l1.41-1.41"/>
+              <circle cx="10" cy="10" r="2.5"/>
+            </svg>
+          </div>
+          <div class="type-card__name">AI Proposal</div>
+          <div class="type-card__desc">Describe your client and project — the AI generates a polished, personalised proposal.</div>
+        </button>
+
+        <button class="type-card" type="button" data-type="deck" aria-pressed="false">
+          <div class="type-card__icon">
+            <!-- layers icon -->
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="10,2 18,7 10,12 2,7"/>
+              <path d="M2 12l8 5 8-5"/>
+              <path d="M2 9.5l8 5 8-5"/>
+            </svg>
+          </div>
+          <div class="type-card__name">Deck</div>
+          <div class="type-card__desc">Template-based structured deck. Build section by section from pre-designed blocks.</div>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- STEP 2: form -->
+    <div class="modal__body" id="step2Body" hidden>
+      <form id="proposalForm" novalidate autocomplete="off">
+
+        <div class="form-row">
+          <label class="form-label" for="fSlug">Slug <span>(required)</span></label>
+          <input class="form-input" type="text" id="fSlug" name="slug"
+                 placeholder="e.g. acme-q3-proposal"
+                 pattern="[a-z0-9][a-z0-9\-]*"
+                 autocomplete="off" spellcheck="false"/>
+          <span class="form-hint" id="fSlugHint">Lowercase letters, numbers, hyphens only. Used in the subdomain.</span>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="fName">Proposal name <span>(optional)</span></label>
+          <input class="form-input" type="text" id="fName" name="name"
+                 placeholder="e.g. Acme Corp — Q3 Brand Refresh"/>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="fClient">Client name <span>(optional)</span></label>
+          <input class="form-input" type="text" id="fClient" name="clientName"
+                 placeholder="e.g. Acme Corp"/>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="fPassword">Password protection <span>(optional)</span></label>
+          <input class="form-input" type="text" id="fPassword" name="password"
+                 placeholder="Leave blank to set later"
+                 autocomplete="new-password"/>
+          <span class="form-hint">If set, clients must enter this to view the proposal.</span>
+        </div>
+
+        <div class="form-row" id="descRow" hidden>
+          <label class="form-label" for="fDesc">Project description <span>(AI Proposal)</span></label>
+          <textarea class="form-textarea" id="fDesc" name="description" rows="4"
+                    placeholder="A CRM tool for mortgage loan officers — we're rebuilding their pipeline dashboard and onboarding flow to cut admin time by 40%..."></textarea>
+          <span class="form-hint">The AI uses this to generate the proposal content.</span>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal__footer" id="modalFooter">
+      <!-- Step 1 footer -->
+      <div id="footer1" style="display:flex;gap:10px;align-items:center;width:100%;justify-content:flex-end;">
+        <button class="btn" type="button" id="cancelBtn1">Cancel</button>
+        <button class="btn btn--gold" type="button" id="nextBtn" disabled>
+          Continue
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;" aria-hidden="true">
+            <path d="M3 7h8M8 4l3 3-3 3"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Step 2 footer -->
+      <div id="footer2" style="display:flex;gap:10px;align-items:center;width:100%;justify-content:flex-end;" hidden>
+        <button class="btn" type="button" id="backBtn">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;" aria-hidden="true">
+            <path d="M11 7H3M6 4L3 7l3 3"/>
+          </svg>
+          Back
+        </button>
+        <button class="btn" type="button" id="cancelBtn2">Cancel</button>
+        <button class="btn btn--gold" type="button" id="submitBtn">
+          Create Proposal
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ==========================================================
+   Mirage Studios — Admin Dashboard
+   ========================================================== */
+
+const ROOT_DOMAIN  = window.__ROOT_DOMAIN__ || 'miragestudios.io';
+const PROPOSALS    = Array.isArray(window.__PROPOSALS__) ? window.__PROPOSALS__ : [];
+const BUILD_ID     = window.__BUILD_ID__ || '';
+
+/* ---- helpers ---- */
+const $ = (id) => document.getElementById(id);
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s == null ? '' : s);
+  return d.innerHTML;
+}
+function toast(msg, dur = 2000) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('is-visible');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('is-visible'), dur);
+}
+
+/* ---- build id ---- */
+if (BUILD_ID) {
+  $('buildId').textContent = BUILD_ID;
+}
+
+/* ==========================================================
+   RENDER PROPOSALS
+   ========================================================== */
+function renderProposals() {
+  const grid = $('proposalsGrid');
+  const label = $('countLabel');
+  const proposals = PROPOSALS;
+
+  label.textContent = proposals.length ? ' — ' + proposals.length : '';
+
+  if (!proposals.length) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-state__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M8 12h8M12 8v8"/>
+          </svg>
+        </div>
+        <div class="empty-state__title">No proposals yet</div>
+        <div class="empty-state__sub">Create your first proposal to start sending beautiful decks to clients.</div>
+        <button class="btn btn--gold" type="button" onclick="openModal()">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="width:13px;height:13px;">
+            <line x1="7" y1="1.5" x2="7" y2="12.5"/>
+            <line x1="1.5" y1="7" x2="12.5" y2="7"/>
+          </svg>
+          New Proposal
+        </button>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = proposals.map(p => buildCard(p)).join('');
+}
+
+function buildCard(p) {
+  const subdomain = p.slug + '.' + ROOT_DOMAIN;
+  const fullUrl   = 'https://' + subdomain;
+  const typeBadge = p.type === 'simple'
+    ? '<span class="card-type-badge card-type-badge--simple">AI Proposal</span>'
+    : '<span class="card-type-badge card-type-badge--deck">Deck</span>';
+
+  const lockIcon = p.hasPassword
+    ? `<span class="card-lock">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <rect x="2.5" y="6.5" width="9" height="6.5" rx="1.5"/>
+          <path d="M4.5 6.5V4.5a2.5 2.5 0 0 1 5 0v2"/>
+        </svg>
+        Password protected
+      </span>`
+    : '';
+
+  return `
+    <div class="proposal-card">
+      <div class="card-top">
+        <h2 class="card-name">${esc(p.name || p.slug)}</h2>
+        ${typeBadge}
+      </div>
+      <div class="card-meta">
+        ${p.clientName ? `<div class="card-client">${esc(p.clientName)}</div>` : ''}
+        <div class="card-slug">${esc(p.slug)}</div>
+        <div class="card-subdomain">
+          <span class="dot"></span>
+          <span>${esc(subdomain)}</span>
+        </div>
+        ${lockIcon}
+      </div>
+      <div class="card-actions">
+        <a class="card-edit-link" href="/editor/${esc(p.slug)}">
+          Edit
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 12l3-1 6-6a1.414 1.414 0 0 0-2-2L3 10l-1 2z"/>
+            <path d="M8.5 3.5l2 2"/>
+          </svg>
+        </a>
+        <button class="btn btn--ghost" type="button" onclick="previewProposal('${esc(p.slug)}', this)">Preview</button>
+        <button class="btn btn--ghost" type="button" onclick="copyLink('${esc(p.slug)}', '${esc(fullUrl)}', this)">Copy link</button>
+      </div>
+    </div>`;
+}
+
+/* ==========================================================
+   CARD ACTIONS
+   ========================================================== */
+async function previewProposal(slug, btn) {
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const res = await fetch('/api/proposals/' + encodeURIComponent(slug) + '/preview-token', {
+      method: 'GET', credentials: 'include',
+    });
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error(j.error || 'HTTP ' + res.status);
+    }
+    const data = await res.json();
+    const previewUrl = data.url || ('https://' + slug + '.' + ROOT_DOMAIN + '/_preview?token=' + encodeURIComponent(data.token || ''));
+    window.open(previewUrl, '_blank', 'noopener');
+  } catch (e) {
+    toast('Preview failed: ' + e.message, 3000);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = orig;
+  }
+}
+
+function copyLink(slug, url, btn) {
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  }).catch(() => {
+    /* fallback */
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none;';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    } catch (e2) {
+      toast('Could not copy link', 2500);
+    }
+  });
+}
+
+/* ==========================================================
+   NEW PROPOSAL MODAL
+   ========================================================== */
+let modalState = {
+  step: 1,
+  type: null,   /* 'simple' | 'deck' */
+  submitting: false,
+};
+
+function openModal() {
+  modalState = { step: 1, type: null, submitting: false };
+  resetModal();
+  $('newModal').classList.add('is-open');
+  /* focus first type card */
+  const cards = document.querySelectorAll('.type-card');
+  if (cards[0]) cards[0].focus();
+}
+
+function closeModal() {
+  $('newModal').classList.remove('is-open');
+}
+
+function resetModal() {
+  /* Steps */
+  setStep(1);
+  /* Form */
+  $('proposalForm').reset();
+  $('fSlug').classList.remove('is-invalid');
+  $('fSlugHint').classList.remove('is-error');
+  $('fSlugHint').textContent = 'Lowercase letters, numbers, hyphens only. Used in the subdomain.';
+  /* Type cards */
+  document.querySelectorAll('.type-card').forEach(c => {
+    c.classList.remove('is-selected');
+    c.setAttribute('aria-pressed', 'false');
+  });
+  /* Buttons */
+  $('nextBtn').disabled = true;
+  $('submitBtn').disabled = false;
+  $('submitBtn').textContent = 'Create Proposal';
+}
+
+function setStep(n) {
+  modalState.step = n;
+  $('step1Body').hidden = (n !== 1);
+  $('step2Body').hidden = (n !== 2);
+  $('footer1').hidden   = (n !== 1);
+  $('footer2').hidden   = (n !== 2);
+  $('dot1').className   = 'step-dot' + (n === 1 ? ' is-active' : ' is-done');
+  $('dot2').className   = 'step-dot' + (n === 2 ? ' is-active' : '');
+
+  if (n === 1) {
+    $('modalTitle').textContent = 'New Proposal';
+    $('modalSub').textContent   = 'Choose the proposal type to get started.';
+  } else {
+    const label = modalState.type === 'simple' ? 'AI Proposal' : 'Deck';
+    $('modalTitle').textContent = 'New ' + label;
+    $('modalSub').textContent   = 'Fill in the details below to create the proposal.';
+    /* Show/hide description field */
+    $('descRow').hidden = (modalState.type !== 'simple');
+    /* Focus slug */
+    setTimeout(() => $('fSlug').focus(), 40);
+  }
+}
+
+/* Type card selection */
+document.querySelectorAll('.type-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.type-card').forEach(c => {
+      c.classList.remove('is-selected');
+      c.setAttribute('aria-pressed', 'false');
+    });
+    card.classList.add('is-selected');
+    card.setAttribute('aria-pressed', 'true');
+    modalState.type = card.dataset.type;
+    $('nextBtn').disabled = false;
+  });
+  /* Allow keyboard activation */
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
+  });
+});
+
+/* Step 1 → 2 */
+$('nextBtn').addEventListener('click', () => {
+  if (!modalState.type) return;
+  setStep(2);
+});
+
+/* Step 2 → 1 */
+$('backBtn').addEventListener('click', () => setStep(1));
+
+/* Cancel */
+$('cancelBtn1').addEventListener('click', closeModal);
+$('cancelBtn2').addEventListener('click', closeModal);
+$('newProposalBtn').addEventListener('click', openModal);
+
+/* Close on scrim click */
+$('newModal').addEventListener('click', (e) => {
+  if (e.target === $('newModal')) closeModal();
+});
+
+/* Close on Escape */
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && $('newModal').classList.contains('is-open')) closeModal();
+});
+
+/* Slug validation */
+$('fSlug').addEventListener('input', () => validateSlug(false));
+$('fSlug').addEventListener('blur',  () => validateSlug(true));
+
+function validateSlug(showError) {
+  const val = $('fSlug').value;
+  const hint = $('fSlugHint');
+  const input = $('fSlug');
+  if (!val) {
+    input.classList.remove('is-invalid');
+    hint.classList.remove('is-error');
+    hint.textContent = 'Lowercase letters, numbers, hyphens only. Used in the subdomain.';
+    return false;
+  }
+  const ok = /^[a-z0-9][a-z0-9-]*$/.test(val);
+  if (!ok && showError) {
+    input.classList.add('is-invalid');
+    hint.classList.add('is-error');
+    hint.textContent = 'Only lowercase letters, numbers, and hyphens. Must start with a letter or number.';
+  } else if (ok) {
+    input.classList.remove('is-invalid');
+    hint.classList.remove('is-error');
+    hint.textContent = 'Preview: ' + val + '.' + ROOT_DOMAIN;
+  }
+  return ok;
+}
+
+/* Submit */
+$('submitBtn').addEventListener('click', async () => {
+  if (modalState.submitting) return;
+
+  /* Validate slug */
+  const slug = $('fSlug').value.trim();
+  if (!slug) {
+    $('fSlug').classList.add('is-invalid');
+    $('fSlugHint').classList.add('is-error');
+    $('fSlugHint').textContent = 'Slug is required.';
+    $('fSlug').focus();
+    return;
+  }
+  if (!validateSlug(true)) {
+    $('fSlug').focus();
+    return;
+  }
+
+  const payload = {
+    slug,
+    name:        $('fName').value.trim() || slug,
+    type:        modalState.type,
+    clientName:  $('fClient').value.trim() || undefined,
+    password:    $('fPassword').value || undefined,
+  };
+  if (modalState.type === 'simple') {
+    const desc = $('fDesc').value.trim();
+    if (desc) payload.description = desc;
+  }
+
+  /* Remove undefined keys */
+  Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+
+  modalState.submitting = true;
+  const btn = $('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Creating…';
+
+  try {
+    const res = await fetch('/api/proposals', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error(j.error || 'HTTP ' + res.status);
+    }
+    /* Redirect to editor regardless of type */
+    window.location.href = '/editor/' + encodeURIComponent(slug);
+  } catch (e) {
+    toast('Error: ' + e.message, 3500);
+    btn.disabled = false;
+    btn.textContent = 'Create Proposal';
+    modalState.submitting = false;
+  }
+});
+
+/* ==========================================================
+   BOOT
+   ========================================================== */
+renderProposals();
+</script>
+</body>
+</html>
