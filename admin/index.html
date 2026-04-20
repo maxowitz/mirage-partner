@@ -986,7 +986,7 @@ async function previewProposal(slug, btn) {
       throw new Error(j.error || 'HTTP ' + res.status);
     }
     const data = await res.json();
-    const previewUrl = data.url || ('https://' + slug + '.' + ROOT_DOMAIN + '/_preview?token=' + encodeURIComponent(data.token || ''));
+    const previewUrl = data.previewUrl || ('https://' + slug + '.' + ROOT_DOMAIN + '/_preview?t=' + encodeURIComponent(data.token || ''));
     window.open(previewUrl, '_blank', 'noopener');
   } catch (e) {
     toast('Preview failed: ' + e.message, 3000);
@@ -1065,8 +1065,11 @@ function setStep(n) {
   modalState.step = n;
   $('step1Body').hidden = (n !== 1);
   $('step2Body').hidden = (n !== 2);
-  $('footer1').hidden   = (n !== 1);
-  $('footer2').hidden   = (n !== 2);
+  /* Use style.display — not hidden — because the footer divs have an inline
+     style="display:flex" that has higher CSS specificity than the hidden
+     attribute's display:none, causing both footers to always render. */
+  $('footer1').style.display = (n === 1) ? 'flex' : 'none';
+  $('footer2').style.display = (n === 2) ? 'flex' : 'none';
   $('dot1').className   = 'step-dot' + (n === 1 ? ' is-active' : ' is-done');
   $('dot2').className   = 'step-dot' + (n === 2 ? ' is-active' : '');
 

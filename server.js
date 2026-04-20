@@ -403,7 +403,8 @@ app.post('/api/proposals', adminOnly, async (req, res) => {
   }
   if (deckExists(slug)) return res.status(409).json({ error: 'Slug already in use.' });
   try {
-    await createDeck({ slug, name: name || slug, password: password || null });
+    const result = await createDeck({ slug, name: name || slug, password: password || null });
+    if (result && result.error) return res.status(400).json({ error: result.error });
     writeMeta(slug, { type, clientName: clientName || null, createdAt: new Date().toISOString() });
     res.json({ ok: true, slug });
   } catch (e) {
