@@ -1,0 +1,58 @@
+export const SECTIONS = [
+  {
+    id: 'landing',
+    warmth: 0.0,
+    content: null,
+  },
+  {
+    id: 'work',
+    warmth: 0.4,
+    label: '01',
+    headline: "Four problems.\nFour industries.\nOne studio.",
+    body: "A tourism board running on custom AI. A sponsorship team that never misses a deal. A DAM that finally understands marketing. Each started as someone\u2019s impossible idea.",
+    items: [
+      { name: 'SaltLakeIQ',       desc: 'A new brain for a destination marketing org.' },
+      { name: 'Sponsorships CRM', desc: 'Zero missed deals since launch.' },
+      { name: 'WebNotes',         desc: 'Annotate any live page. No extension.' },
+      { name: 'The Dam',          desc: 'The DAM built for how marketers actually work.' },
+    ],
+  },
+  {
+    id: 'practice',
+    warmth: -0.2,
+    label: '02',
+    headline: "We build what\nthe off-the-shelf\ncan\u2019t.",
+    body: 'Two-person startups and enterprise orgs. If you can describe it, we can build it. There is no size requirement and no ceiling on what\u2019s possible.',
+    items: [
+      { name: 'AI Consulting',   desc: 'Find the ten places a model creates real leverage.' },
+      { name: 'App Development', desc: 'Software built for exactly one problem.' },
+      { name: 'Marketing',       desc: 'Presence that has an actual edge.' },
+      { name: 'Photogrammetry',  desc: 'Physical objects. Digital resolution.' },
+    ],
+  },
+  {
+    id: 'brief',
+    warmth: -0.4,
+    label: '03',
+    headline: "Build Your\nBrief",
+    body: "Describe what you\u2019re trying to build. We\u2019ll write the brief.",
+  },
+  {
+    id: 'contact',
+    warmth: 0.1,
+    label: '04',
+    headline: "hello@miragestudios.io",
+    body: "We work on a small number of engagements at a time. If it looks impossible from where you\u2019re standing \u2014 that\u2019s exactly where we start.",
+  },
+]
+
+export const MOCK_BRIEF = {
+  headline: 'Precision at the Edge of the Known',
+  mandate: "Build for the moment when the familiar gives way to something that hasn\u2019t been named yet.",
+  visualDirection: [
+    'Dark ground with surfaces that emerge',
+    'Typography at scale, not decoration',
+    'Color as temperature \u2014 warm ochre against deep black',
+  ],
+  recommendedService: 'App Development \u2014 this needs to exist as software.',
+}
