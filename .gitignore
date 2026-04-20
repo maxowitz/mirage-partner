@@ -1,6 +1,6 @@
 node_modules/
 frontend/node_modules/
-public/
+/public/
 /data/
 *.sqlite
 .env
