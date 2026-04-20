@@ -51,7 +51,10 @@ function getAnthropicClient() {
 const SESSION_SECRET    = process.env.SESSION_SECRET || 'dev-secret-change-me';
 const ADMIN_PASSWORD    = process.env.ADMIN_PASSWORD || 'dev-admin';
 const ROOT_DOMAIN       = (process.env.ROOT_DOMAIN || 'miragestudios.io').toLowerCase();
-const DATA_DIR          = process.env.DATA_DIR || path.join(__dirname, 'data');
+// In Railway, default to /data (volume mount point).
+// In local dev, fall back to ./data next to server.js.
+const DATA_DIR = process.env.DATA_DIR ||
+  (process.env.RAILWAY_ENVIRONMENT ? '/data' : path.join(__dirname, 'data'));
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 const BUILD_ID = (process.env.RAILWAY_GIT_COMMIT_SHA || '').slice(0, 7) ||

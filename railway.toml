@@ -1,0 +1,14 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd frontend && npm install && npm run build"
+
+[deploy]
+startCommand = "node server.js"
+healthcheckPath = "/healthz"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+# Volume must be mounted at /data in Railway dashboard.
+# DATA_DIR auto-resolves to /data when RAILWAY_ENVIRONMENT is set.
+# To override: set DATA_DIR=/your/path in Railway service variables.

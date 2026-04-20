@@ -11,7 +11,10 @@ const path = require('path');
 const fs = require('fs');
 const Database = require('better-sqlite3');
 
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
+// In Railway, default to /data (volume mount point).
+// In local dev, fall back to ./data at the project root.
+const DATA_DIR = process.env.DATA_DIR ||
+  (process.env.RAILWAY_ENVIRONMENT ? '/data' : path.join(__dirname, '..', 'data'));
 const DB_PATH = path.join(DATA_DIR, 'mirage.sqlite');
 
 function ensureDataDir() {
