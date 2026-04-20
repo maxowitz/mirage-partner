@@ -26,7 +26,7 @@ const fs           = require('fs');
 const crypto       = require('crypto');
 
 const {
-  listDecks, getDeck, getDeckPasswordHash,
+  listDecks, getDeck,
   setDeckPassword, setDeckName, verifyDeckPassword,
   createDeck, duplicateDeck,
 } = require('./auth/decks');
@@ -40,10 +40,19 @@ const ai        = require('./lib/ai');
 const app = express();
 app.set('trust proxy', 1);
 
-const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-me';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'dev-admin';
-const ROOT_DOMAIN    = (process.env.ROOT_DOMAIN || 'miragestudios.io').toLowerCase();
-const DATA_DIR       = process.env.DATA_DIR || path.join(__dirname, 'data');
+/* ── Anthropic client (singleton) ──────────────────────────────────────────── */
+const Anthropic = require('@anthropic-ai/sdk');
+let _anthropic = null;
+function getAnthropicClient() {
+  if (!_anthropic) _anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+  return _anthropic;
+}
+
+const SESSION_SECRET    = process.env.SESSION_SECRET || 'dev-secret-change-me';
+const ADMIN_PASSWORD    = process.env.ADMIN_PASSWORD || 'dev-admin';
+const ROOT_DOMAIN       = (process.env.ROOT_DOMAIN || 'miragestudios.io').toLowerCase();
+const DATA_DIR          = process.env.DATA_DIR || path.join(__dirname, 'data');
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 const BUILD_ID = (process.env.RAILWAY_GIT_COMMIT_SHA || '').slice(0, 7) ||
                  ('dev-' + Math.floor(Date.now() / 1000));
@@ -245,7 +254,7 @@ app.post('/auth/login', async (req, res) => {
 
   if (scope.kind === 'admin') {
     if (password !== ADMIN_PASSWORD) return res.redirect('/?error=1');
-    res.cookie(cookieName(scope), ADMIN_PASSWORD, {
+    res.cookie(cookieName(scope), 'admin-authenticated', {
       httpOnly: true, secure: !!process.env.ROOT_DOMAIN,
       sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000, signed: true,
     });
@@ -254,12 +263,12 @@ app.post('/auth/login', async (req, res) => {
 
   if (scope.kind === 'proposal') {
     if (!deckExists(scope.slug)) return res.status(404).send('Not found');
-    const hash = await getDeckPasswordHash(scope.slug);
-    if (!hash || !(await verifyDeckPassword(password, hash))) {
+    if (!(await verifyDeckPassword(scope.slug, password))) {
       return res.redirect('/?error=1');
     }
-    const sessionId = createSession({ deckSlug: scope.slug, ipHash: hashIp(req.ip || ''), userAgent: req.headers['user-agent'] || '' });
-    res.cookie(cookieName(scope), sessionId, {
+    const { session, error: sessionErr } = createSession({ deckSlug: scope.slug, ipHash: hashIp(req.ip || '', process.env.SESSION_SECRET), userAgent: req.headers['user-agent'] || '' });
+    if (sessionErr) return res.status(500).send('Session error');
+    res.cookie(cookieName(scope), session.id, {
       httpOnly: true, secure: !!process.env.ROOT_DOMAIN,
       sameSite: 'lax', maxAge: 7 * 24 * 60 * 60 * 1000, signed: true,
     });
@@ -296,7 +305,7 @@ app.use((req, res, next) => {
 
   if (scope.kind === 'admin') {
     const cookie = req.signedCookies[cookieName(scope)];
-    if (cookie && cookie === ADMIN_PASSWORD) { req._scope = scope; return next(); }
+    if (cookie && cookie === 'admin-authenticated') { req._scope = scope; return next(); }
     if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'not authenticated' });
     return renderLogin(req, res, scope);
   }
@@ -531,11 +540,8 @@ app.post('/api/proposals/:slug/generate', adminOnly, async (req, res) => {
     sections, tone, additionalContext,
   } = req.body;
 
-  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
   if (!ANTHROPIC_API_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not set' });
-
-  const Anthropic = require('@anthropic-ai/sdk');
-  const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+  const anthropic = getAnthropicClient();
 
   const systemPrompt = `You are an expert at building beautiful, self-contained HTML proposal microsites for a creative digital studio called Mirage Studios.
 

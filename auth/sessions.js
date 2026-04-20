@@ -47,12 +47,13 @@ function truncate(str, n) {
   return s.length > n ? s.slice(0, n) : s;
 }
 
-/** Create a session row + upsert the deck_viewers counter.
+/** Create a session row + optionally upsert the deck_viewers counter.
+ *  email is optional — omit for anonymous proposal viewers.
  *  Returns { session } on success, { error } on failure. */
-function createSession({ deckSlug, email, ipHash = null, userAgent = null, referrer = null } = {}) {
-  const e = normalizeEmail(email);
-  if (!isValidEmailFormat(e)) return { error: 'Please enter a valid email address.' };
+function createSession({ deckSlug, email = null, ipHash = null, userAgent = null, referrer = null } = {}) {
   if (!deckSlug) return { error: 'Missing deck slug.' };
+  const e = email ? normalizeEmail(email) : '';
+  if (e && !isValidEmailFormat(e)) return { error: 'Please enter a valid email address.' };
 
   const now = new Date().toISOString();
   const id  = newSessionId();
@@ -65,19 +66,21 @@ function createSession({ deckSlug, email, ipHash = null, userAgent = null, refer
       VALUES (?, ?, ?, ?, ?, NULL, ?, ?, ?, 0)
     `).run(id, deckSlug, e, now, now, ipHash, truncate(userAgent, UA_MAX_CHARS), truncate(referrer, UA_MAX_CHARS));
 
-    const existing = db.prepare('SELECT 1 FROM deck_viewers WHERE deck_slug = ? AND email = ?').get(deckSlug, e);
-    if (existing) {
-      db.prepare(`
-        UPDATE deck_viewers
-        SET last_seen_at = ?, total_opens = total_opens + 1
-        WHERE deck_slug = ? AND email = ?
-      `).run(now, deckSlug, e);
-    } else {
-      db.prepare(`
-        INSERT INTO deck_viewers
-          (deck_slug, email, first_seen_at, last_seen_at, total_opens, total_seconds)
-        VALUES (?, ?, ?, ?, 1, 0)
-      `).run(deckSlug, e, now, now);
+    if (e) {
+      const existing = db.prepare('SELECT 1 FROM deck_viewers WHERE deck_slug = ? AND email = ?').get(deckSlug, e);
+      if (existing) {
+        db.prepare(`
+          UPDATE deck_viewers
+          SET last_seen_at = ?, total_opens = total_opens + 1
+          WHERE deck_slug = ? AND email = ?
+        `).run(now, deckSlug, e);
+      } else {
+        db.prepare(`
+          INSERT INTO deck_viewers
+            (deck_slug, email, first_seen_at, last_seen_at, total_opens, total_seconds)
+          VALUES (?, ?, ?, ?, 1, 0)
+        `).run(deckSlug, e, now, now);
+      }
     }
   });
   tx();
